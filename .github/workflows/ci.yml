@@ -7,6 +7,7 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       checks: write
       pull-requests: write
 
@@ -46,4 +47,13 @@ jobs:
           junit-path:
             pytest.xml
           show-diffcover: 'true'
-
+      
+      - name: Review agent
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          OPENAI_MODEL: gpt-5.6-terra
+        run: poetry run python agent.py $GITHUB_TOKEN $REPOSITORY $PR_NUMBER $OPENAI_API_KEY $OPENAI_BASE_URL
